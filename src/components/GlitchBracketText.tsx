@@ -1,6 +1,16 @@
 // components/GlitchBracketText.tsx
 
 import type { ReactNode } from 'react';
+import {
+  glitchBracketSymbolClassName,
+  glitchBracketSymbolInnerClassName,
+  glitchBracketTextClassName,
+  glitchBracketTextContentClassName,
+  glitchLayerClassName,
+  glitchLeftLayerAnimationClassName,
+  glitchMainClassName,
+  glitchRightLayerAnimationClassName,
+} from '@/components/glitchStyles';
 
 type GlitchBracketTextProps = {
   children: ReactNode;
@@ -9,21 +19,21 @@ type GlitchBracketTextProps = {
 
 export function GlitchBracketText({ children, className = '' }: GlitchBracketTextProps) {
   return (
-    <span className={`glitch-bracket-text ${className}`}>
-      <span className="glitch-bracket-text-symbol glitch-bracket-text-left" aria-hidden="true">
-        <span className="glitch-bracket-text-symbol-inner">[</span>
+    <span className={`${glitchBracketTextClassName} ${className}`}>
+      <span className={`${glitchBracketSymbolClassName} left-[-2rem]`} aria-hidden="true">
+        <span className={glitchBracketSymbolInnerClassName}>[</span>
       </span>
-      <span className="glitch-bracket-text-content">
-        <span className="glitch-bracket-text-main">{children}</span>
-        <span className="glitch-bracket-text-layer glitch-bracket-text-layer-left" aria-hidden="true">
+      <span className={glitchBracketTextContentClassName}>
+        <span className={glitchMainClassName}>{children}</span>
+        <span className={`${glitchLayerClassName} ${glitchLeftLayerAnimationClassName}`} aria-hidden="true">
           {children}
         </span>
-        <span className="glitch-bracket-text-layer glitch-bracket-text-layer-right" aria-hidden="true">
+        <span className={`${glitchLayerClassName} ${glitchRightLayerAnimationClassName}`} aria-hidden="true">
           {children}
         </span>
       </span>
-      <span className="glitch-bracket-text-symbol glitch-bracket-text-right" aria-hidden="true">
-        <span className="glitch-bracket-text-symbol-inner">]</span>
+      <span className={`${glitchBracketSymbolClassName} right-[-2rem]`} aria-hidden="true">
+        <span className={glitchBracketSymbolInnerClassName}>]</span>
       </span>
     </span>
   );

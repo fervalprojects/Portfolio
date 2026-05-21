@@ -1,34 +1,13 @@
-import Link from 'next/link';
 import { AmbientMatrixGlow } from '@/components/AmbientMatrixGlow';
+import { Header } from '@/components/Header';
 import { TechIconCard } from '@/components/TechIconCard';
-import { GlitchBracketText } from '@/components/GlitchBracketText';
 import { ScrambleHeroText } from '@/components/ScrambleHeroText';
-import { ThemeToggle } from '@/components/ThemeToggle';
-function itemList(text: string, href: string) {
-  return (
-    <li className="group relative flex items-center overflow-visible text-sm font-medium">
-      <Link href={href}>
-        <GlitchBracketText className="text-base font-medium">{text}</GlitchBracketText>
-      </Link>
-    </li>
-  );
-}
 
 export default function Home() {
   return (
     <div className="main-background flex flex-col items-center">
       <AmbientMatrixGlow />
-      <header className="w-full bg-black/20 backdrop-blur-sm sticky z-100">
-        <nav className="flex justify-between items-center px-5 py-5">
-          <div>FERVAL</div>
-          <ul className="flex gap-20">
-            {itemList('Sobre mi', '#about')}
-            {itemList('Proyectos', '#projects')}
-            {itemList('Contacto', '#contact')}
-          </ul>
-          <ThemeToggle />
-        </nav>
-      </header>
+      <Header />
       <main className="max-w-7xl flex flex-col">
         <section className="relative z-3 flex min-h-screen flex-col items-center justify-center px-6 text-center gap-2">
           <ScrambleHeroText text=">_ Marco Fernandez" className="text-6xl" />

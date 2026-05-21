@@ -13,6 +13,16 @@ type ScrambleHeroTextProps = {
 };
 
 const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$';
+const BASE_HEADING_CLASSNAME = 'inline-flex min-w-[14ch] cursor-pointer justify-start text-left leading-[1.05] font-extrabold select-none';
+const BASE_CHAR_CLASSNAME = 'inline-flex w-[1ch] justify-center';
+
+function getCharClassName(hasCursor: boolean) {
+  if (!hasCursor) {
+    return BASE_CHAR_CLASSNAME;
+  }
+
+  return `${BASE_CHAR_CLASSNAME} relative before:absolute before:top-[10%] before:right-[-0.08em] before:h-[80%] before:w-[0.12em] before:bg-major before:shadow-[0_0_8px_color-mix(in_srgb,var(--color-major)_75%,transparent)] before:content-[''] before:animate-[terminal-cursor-blink_1s_steps(1,end)_infinite]`;
+}
 
 export function ScrambleHeroText({ text, className = '', scrambleColor = 'var(--color-major)', finalColor = 'var(--foreground)', speed = 30, delayStep = 60, cursorIndexes = [] }: ScrambleHeroTextProps) {
   const [displayText, setDisplayText] = useState<string | null>(null);
@@ -126,11 +136,11 @@ export function ScrambleHeroText({ text, className = '', scrambleColor = 'var(--
   }, [runScramble, clearTimers, resetToFinalText]);
 
   return (
-    <h1 ref={headingRef} className={`scramble-hero-text cursor-pointer select-none ${className}`} onClick={runScramble} title="Click para reiniciar la animación">
+    <h1 ref={headingRef} className={`${BASE_HEADING_CLASSNAME} ${className}`} onClick={runScramble} title="Click para reiniciar la animación">
       {renderedText.split('').map((char, index) => (
         <span
           key={index}
-          className={`scramble-char ${cursorIndexes.includes(index) ? 'scramble-char-terminal-cursor' : ''}`}
+          className={getCharClassName(cursorIndexes.includes(index))}
           style={{
             color: settledIndexes[index] || char === ' ' ? finalColor : scrambleColor,
           }}
