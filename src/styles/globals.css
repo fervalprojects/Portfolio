@@ -2,7 +2,9 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #212529;
+  --main-background: #f8f9fa;
+  --matrix-dot-color: #e9ecef;
 }
 
 @theme inline {
@@ -10,15 +12,31 @@
   --color-foreground: var(--foreground);
   --font-display: var(--font-silkscreen);
   --font-terminal: var(--font-vt323);
-  --color-major: #0d3b66;
-  --color-minor: #faf0ca;
+  --color-major: #63ff52;
+  --color-minor: #eb5e28;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #f8f9fa;
+    --main-background: #121212;
+    --matrix-dot-color: #343a40;
   }
+}
+
+html[data-theme='light'] {
+  --background: #ffffff;
+  --foreground: #212529;
+  --main-background: #f8f9fa;
+  --matrix-dot-color: #e9ecef;
+}
+
+html[data-theme='dark'] {
+  --background: #0a0a0a;
+  --foreground: #f8f9fa;
+  --main-background: #121212;
+  --matrix-dot-color: #1f2020d8;
 }
 
 body {
@@ -27,15 +45,41 @@ body {
   font-family: var(--font-display), Arial, Helvetica, sans-serif;
 }
 
+/* Main Background with Repeating Accent Matrix */
+
 .main-background {
-  @apply relative min-h-screen w-full  bg-[#121212];
+  @apply relative min-h-screen w-full;
 
-  background-image: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.04) 1px, transparent 0), linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 0), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 0);
+  background-color: var(--main-background);
+}
 
-  background-size:
-    20px 20px,
-    20px 60px,
-    60px 20px;
+.main-background::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: var(--matrix-dot-color);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96' fill='none'%3E%3Crect x='10' y='10' width='4' height='4' fill='white'/%3E%3Crect x='34' y='10' width='4' height='4' fill='white'/%3E%3Crect x='58' y='10' width='4' height='4' fill='white'/%3E%3Crect x='82' y='10' width='4' height='4' fill='white'/%3E%3Crect x='10' y='34' width='4' height='4' fill='white'/%3E%3Crect x='34' y='34' width='4' height='4' fill='white'/%3E%3Crect x='58' y='34' width='4' height='4' fill='white'/%3E%3Crect x='82' y='34' width='4' height='4' fill='white'/%3E%3Crect x='10' y='58' width='4' height='4' fill='white'/%3E%3Crect x='34' y='58' width='4' height='4' fill='white'/%3E%3Crect x='58' y='58' width='4' height='4' fill='white'/%3E%3Crect x='82' y='58' width='4' height='4' fill='white'/%3E%3Crect x='10' y='82' width='4' height='4' fill='white'/%3E%3Crect x='34' y='82' width='4' height='4' fill='white'/%3E%3Crect x='58' y='82' width='4' height='4' fill='white'/%3E%3Crect x='82' y='82' width='4' height='4' fill='white'/%3E%3C/svg%3E");
+  mask-repeat: repeat;
+  mask-size: 96px 96px;
+  mask-position: 0 0;
+}
+
+.ambient-matrix-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ambient-matrix-glow-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .main-background::after {
@@ -44,14 +88,19 @@ body {
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  opacity: 0.6;
-
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.04) 1px, transparent 0);
-
-  background-size: 60px 60px;
+  opacity: 0.1;
+  background: radial-gradient(circle at center, transparent 15%, rgba(0, 0, 0, 0.32) 100%), linear-gradient(90deg, rgba(18, 18, 18, 0.08), rgba(18, 18, 18, 0.05));
 }
 
-.glitch-bracket-text {
+.main-background > header,
+.main-background > main {
+  position: relative;
+  z-index: 3;
+}
+
+/* Glitch Effect */
+
+:is(.glitch-bracket-text, .glitch-icon) {
   --glitch-duration: 0.45s;
   --glitch-step-mode: steps(2, end);
   --glitch-layer-opacity: 0.65;
@@ -75,17 +124,20 @@ body {
   --glitch-right-15-y: -1px;
   --glitch-right-30-x: 2px;
   --glitch-right-30-y: 2px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.glitch-bracket-text {
   --glitch-right-45-x: 5px;
   --glitch-right-45-y: -2px;
   --glitch-right-60-x: 2px;
   --glitch-right-60-y: 1px;
-  position: relative;
-  display: inline-flex;
   min-height: 2rem;
-  align-items: center;
-  justify-content: center;
-  overflow: visible;
-  color: white;
+  color: var(--foreground);
   line-height: 1;
   transition:
     color 0.25s ease,
@@ -119,14 +171,14 @@ body {
 
   display: inline-block;
 
-  color: #80ff80;
+  color: var(--color-major);
   font-size: 1.875rem;
   font-weight: 800;
   font-style: italic;
   line-height: 1;
 
   opacity: 0;
-  filter: drop-shadow(0 0 10px rgba(128, 255, 128, 0.9));
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--color-major) 90%, transparent));
 
   transform: translateY(calc(-50% - 2px));
   transition: opacity 0.2s ease;
@@ -157,23 +209,24 @@ body {
 }
 
 .group:hover .glitch-bracket-text {
-  color: #80ff80;
-  text-shadow: 0 0 10px rgba(128, 255, 128, 0.8);
+  color: var(--color-major);
+  font-style: italic;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--color-major) 80%, transparent);
 }
 
-.group:hover .glitch-bracket-text-main {
+.group:hover :is(.glitch-bracket-text-main, .glitch-icon-main) {
   animation: glitch-main var(--glitch-duration) var(--glitch-step-mode);
 }
 
-.group:hover .glitch-bracket-text-layer {
+.group:hover :is(.glitch-bracket-text-layer, .glitch-icon-layer) {
   opacity: var(--glitch-layer-opacity);
 }
 
-.group:hover .glitch-bracket-text-layer-left {
+.group:hover :is(.glitch-bracket-text-layer-left, .glitch-icon-layer-left) {
   animation: glitch-layer-left var(--glitch-duration) var(--glitch-step-mode);
 }
 
-.group:hover .glitch-bracket-text-layer-right {
+.group:hover :is(.glitch-bracket-text-layer-right, .glitch-icon-layer-right) {
   animation: glitch-layer-right var(--glitch-duration) var(--glitch-step-mode);
 }
 
@@ -340,17 +393,6 @@ body {
 }
 
 .glitch-icon {
-  --glitch-duration: 0.45s;
-  --glitch-step-mode: steps(2, end);
-  --glitch-layer-opacity: 0.65;
-  --glitch-main-15-x: -1px;
-  --glitch-main-15-y: 1px;
-  --glitch-main-30-x: 1px;
-  --glitch-main-30-y: -1px;
-  --glitch-main-45-x: -1px;
-  --glitch-main-45-y: 0;
-  --glitch-main-60-x: 1px;
-  --glitch-main-60-y: 1px;
   --glitch-left-15-x: -5px;
   --glitch-left-15-y: 1px;
   --glitch-left-30-x: -3px;
@@ -367,11 +409,6 @@ body {
   --glitch-right-45-y: -2px;
   --glitch-right-60-x: 2px;
   --glitch-right-60-y: 1px;
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  overflow: visible;
 }
 
 .glitch-icon-main,
@@ -397,28 +434,6 @@ body {
   filter: none;
 }
 
-.group:hover .glitch-icon-main {
-  animation: glitch-main var(--glitch-duration) var(--glitch-step-mode);
-}
-
-.group:hover .glitch-icon-layer {
-  opacity: var(--glitch-layer-opacity);
-}
-
-.group:hover .glitch-icon-layer-left {
-  animation: glitch-layer-left var(--glitch-duration) var(--glitch-step-mode);
-}
-
-.group:hover .glitch-icon-layer-right {
-  animation: glitch-layer-right var(--glitch-duration) var(--glitch-step-mode);
-}
-
-.scramble-hero-wrapper {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
 .scramble-hero-text {
   display: inline-flex;
   min-width: 14ch;
@@ -432,4 +447,32 @@ body {
   display: inline-flex;
   width: 1ch;
   justify-content: center;
+}
+
+.scramble-char-terminal-cursor {
+  position: relative;
+}
+
+.scramble-char-terminal-cursor::after {
+  content: '';
+  position: absolute;
+  right: -0.08em;
+  top: 10%;
+  width: 0.12em;
+  height: 80%;
+  background: var(--color-major);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--color-major) 75%, transparent);
+  animation: terminal-cursor-blink 1s steps(1, end) infinite;
+}
+
+@keyframes terminal-cursor-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+
+  50%,
+  100% {
+    opacity: 0;
+  }
 }

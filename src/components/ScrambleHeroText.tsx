@@ -9,12 +9,13 @@ type ScrambleHeroTextProps = {
   finalColor?: string;
   speed?: number;
   delayStep?: number;
+  cursorIndexes?: number[];
 };
 
 const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$';
 
-export function ScrambleHeroText({ text, className = '', scrambleColor = '#80FF80', finalColor = '#ADB5BD', speed = 50, delayStep = 50 }: ScrambleHeroTextProps) {
-  const [displayText, setDisplayText] = useState(text);
+export function ScrambleHeroText({ text, className = '', scrambleColor = 'var(--color-major)', finalColor = 'var(--foreground)', speed = 30, delayStep = 60, cursorIndexes = [] }: ScrambleHeroTextProps) {
+  const [displayText, setDisplayText] = useState<string | null>(null);
   const [settledIndexes, setSettledIndexes] = useState<boolean[]>(Array(text.length).fill(true));
 
   const headingRef = useRef<HTMLHeadingElement | null>(null);
@@ -30,9 +31,11 @@ export function ScrambleHeroText({ text, className = '', scrambleColor = '#80FF8
   }, []);
 
   const resetToFinalText = useCallback(() => {
-    setDisplayText(text);
+    setDisplayText(null);
     setSettledIndexes(Array(text.length).fill(true));
   }, [text]);
+
+  const renderedText = displayText ?? text;
 
   const runScramble = useCallback(() => {
     clearTimers();
@@ -85,8 +88,6 @@ export function ScrambleHeroText({ text, className = '', scrambleColor = '#80FF8
   }, [text, speed, delayStep, clearTimers]);
 
   useEffect(() => {
-    resetToFinalText();
-
     const node = headingRef.current;
     if (!node) {
       return () => {
@@ -112,7 +113,7 @@ export function ScrambleHeroText({ text, className = '', scrambleColor = '#80FF8
       },
       {
         threshold: 0.6,
-      },
+      }
     );
 
     observer.observe(node);
@@ -121,16 +122,15 @@ export function ScrambleHeroText({ text, className = '', scrambleColor = '#80FF8
       observer.disconnect();
       isVisibleRef.current = false;
       clearTimers();
-      resetToFinalText();
     };
   }, [runScramble, clearTimers, resetToFinalText]);
 
   return (
     <h1 ref={headingRef} className={`scramble-hero-text cursor-pointer select-none ${className}`} onClick={runScramble} title="Click para reiniciar la animación">
-      {displayText.split('').map((char, index) => (
+      {renderedText.split('').map((char, index) => (
         <span
           key={index}
-          className="scramble-char"
+          className={`scramble-char ${cursorIndexes.includes(index) ? 'scramble-char-terminal-cursor' : ''}`}
           style={{
             color: settledIndexes[index] || char === ' ' ? finalColor : scrambleColor,
           }}
