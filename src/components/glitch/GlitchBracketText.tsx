@@ -1,5 +1,3 @@
-// components/GlitchBracketText.tsx
-
 import type { ReactNode } from 'react';
 import {
   glitchBracketSymbolClassName,
@@ -10,7 +8,7 @@ import {
   glitchLeftLayerAnimationClassName,
   glitchMainClassName,
   glitchRightLayerAnimationClassName,
-} from '@/components/glitchStyles';
+} from '@/components/glitch/glitchStyles';
 
 type GlitchBracketTextProps = {
   children: ReactNode;
@@ -20,7 +18,7 @@ type GlitchBracketTextProps = {
 export function GlitchBracketText({ children, className = '' }: GlitchBracketTextProps) {
   return (
     <span className={`${glitchBracketTextClassName} ${className}`}>
-      <span className={`${glitchBracketSymbolClassName} left-[-2rem]`} aria-hidden="true">
+      <span className={`${glitchBracketSymbolClassName} -left-8`} aria-hidden="true">
         <span className={glitchBracketSymbolInnerClassName}>[</span>
       </span>
       <span className={glitchBracketTextContentClassName}>
@@ -32,7 +30,7 @@ export function GlitchBracketText({ children, className = '' }: GlitchBracketTex
           {children}
         </span>
       </span>
-      <span className={`${glitchBracketSymbolClassName} right-[-2rem]`} aria-hidden="true">
+      <span className={`${glitchBracketSymbolClassName} -right-8`} aria-hidden="true">
         <span className={glitchBracketSymbolInnerClassName}>]</span>
       </span>
     </span>

@@ -10,6 +10,7 @@ type ScrambleHeroTextProps = {
   speed?: number;
   delayStep?: number;
   cursorIndexes?: number[];
+  trailingUnderscoreOnComplete?: boolean;
 };
 
 const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$';
@@ -24,9 +25,40 @@ function getCharClassName(hasCursor: boolean) {
   return `${BASE_CHAR_CLASSNAME} relative before:absolute before:top-[10%] before:right-[-0.08em] before:h-[80%] before:w-[0.12em] before:bg-major before:shadow-[0_0_8px_color-mix(in_srgb,var(--color-major)_75%,transparent)] before:content-[''] before:animate-[terminal-cursor-blink_1s_steps(1,end)_infinite]`;
 }
 
-export function ScrambleHeroText({ text, className = '', scrambleColor = 'var(--color-major)', finalColor = 'var(--foreground)', speed = 30, delayStep = 60, cursorIndexes = [] }: ScrambleHeroTextProps) {
-  const [displayText, setDisplayText] = useState<string | null>(null);
-  const [settledIndexes, setSettledIndexes] = useState<boolean[]>(Array(text.length).fill(true));
+function createMaskedText(text: string, randomize = false) {
+  return text
+    .split('')
+    .map((char, index) => {
+      if (char === ' ') {
+        return ' ';
+      }
+
+      if (randomize) {
+        return CHARS[Math.floor(Math.random() * CHARS.length)];
+      }
+
+      return CHARS[(index * 7 + text.length) % CHARS.length];
+    })
+    .join('');
+}
+
+function createInitialSettledIndexes(text: string) {
+  return text.split('').map((char) => char === ' ');
+}
+
+export function ScrambleHeroText({
+  text,
+  className = '',
+  scrambleColor = 'var(--color-major)',
+  finalColor = 'var(--foreground)',
+  speed = 30,
+  delayStep = 60,
+  cursorIndexes = [],
+  trailingUnderscoreOnComplete = false,
+}: ScrambleHeroTextProps) {
+  const [displayText, setDisplayText] = useState<string>(() => createMaskedText(text));
+  const [settledIndexes, setSettledIndexes] = useState<boolean[]>(() => createInitialSettledIndexes(text));
+  const [showTrailingUnderscore, setShowTrailingUnderscore] = useState(false);
 
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   const isVisibleRef = useRef(false);
@@ -40,21 +72,24 @@ export function ScrambleHeroText({ text, className = '', scrambleColor = 'var(--
     intervalsRef.current = [];
   }, []);
 
-  const resetToFinalText = useCallback(() => {
-    setDisplayText(null);
-    setSettledIndexes(Array(text.length).fill(true));
+  const resetToMaskedText = useCallback(() => {
+    setDisplayText(createMaskedText(text, true));
+    setSettledIndexes(createInitialSettledIndexes(text));
+    setShowTrailingUnderscore(false);
   }, [text]);
 
-  const renderedText = displayText ?? text;
+  const renderedText = displayText;
 
   const runScramble = useCallback(() => {
     clearTimers();
+    setShowTrailingUnderscore(false);
 
     const chars = text.split('');
-    const current = [...chars];
+    const current = createMaskedText(text, true).split('');
+    let pendingChars = chars.filter((char) => char !== ' ').length;
 
-    setDisplayText(text);
-    setSettledIndexes(Array(text.length).fill(false));
+    setDisplayText(current.join(''));
+    setSettledIndexes(createInitialSettledIndexes(text));
 
     chars.forEach((char, index) => {
       if (char === ' ') {
@@ -82,6 +117,11 @@ export function ScrambleHeroText({ text, className = '', scrambleColor = 'var(--
 
             setDisplayText(current.join(''));
             clearInterval(interval);
+            pendingChars--;
+
+            if (pendingChars === 0) {
+              setShowTrailingUnderscore(true);
+            }
             return;
           }
 
@@ -118,7 +158,7 @@ export function ScrambleHeroText({ text, className = '', scrambleColor = 'var(--
         if (isVisibleRef.current) {
           isVisibleRef.current = false;
           clearTimers();
-          resetToFinalText();
+          resetToMaskedText();
         }
       },
       {
@@ -133,7 +173,7 @@ export function ScrambleHeroText({ text, className = '', scrambleColor = 'var(--
       isVisibleRef.current = false;
       clearTimers();
     };
-  }, [runScramble, clearTimers, resetToFinalText]);
+  }, [runScramble, clearTimers, resetToMaskedText]);
 
   return (
     <h1 ref={headingRef} className={`${BASE_HEADING_CLASSNAME} ${className}`} onClick={runScramble} title="Click para reiniciar la animación">
@@ -148,6 +188,15 @@ export function ScrambleHeroText({ text, className = '', scrambleColor = 'var(--
           {char === ' ' ? '\u00A0' : char}
         </span>
       ))}
+      {trailingUnderscoreOnComplete ? (
+        <span
+          className={`ml-[0.08em] inline-flex w-[1ch] justify-center text-major ${showTrailingUnderscore ? 'animate-[terminal-cursor-blink_1s_steps(1,end)_infinite] opacity-100' : 'opacity-0'}`}
+          style={{ color: scrambleColor }}
+          aria-hidden="true"
+        >
+          _
+        </span>
+      ) : null}
     </h1>
   );
 }

@@ -1,7 +1,7 @@
 // components/TechIconCard.tsx
 
 import Image from 'next/image';
-import { GlitchBracketText } from '@/components/GlitchBracketText';
+import { GlitchBracketText } from '@/components/glitch/GlitchBracketText';
 import {
   glitchIconClassName,
   glitchIconImageClassName,
@@ -9,7 +9,7 @@ import {
   glitchLeftLayerAnimationClassName,
   glitchMainClassName,
   glitchRightLayerAnimationClassName,
-} from '@/components/glitchStyles';
+} from '@/components/glitch/glitchStyles';
 
 type TechIconCardProps = {
   title: string;

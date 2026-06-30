@@ -1,7 +1,14 @@
 import type { Metadata } from 'next';
-import { VT323, Silkscreen } from 'next/font/google';
+import { cookies } from 'next/headers';
+import { VT323, Silkscreen, Geist } from 'next/font/google';
 import Script from 'next/script';
+import type { ReactNode } from 'react';
+import { LanguageProvider } from '@/components/translate/LanguageProvider';
+import { getInitialLanguage, LANGUAGE_COOKIE_NAME } from '@/components/translate/translations';
 import '@/styles/globals.css';
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const vt323 = VT323({
   variable: '--font-vt323',
@@ -20,13 +27,16 @@ export const metadata: Metadata = {
   description: 'Portfolio de Marco Fernandez, desarrollador web.',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const initialLanguage = getInitialLanguage(cookieStore.get(LANGUAGE_COOKIE_NAME)?.value);
+
   return (
-    <html lang="es" suppressHydrationWarning className={`${vt323.variable} ${silkscreen.variable} h-full antialiased`}>
+    <html lang={initialLanguage} data-language={initialLanguage} suppressHydrationWarning className={cn("h-full", "antialiased", vt323.variable, silkscreen.variable, "font-sans", geist.variable)}>
       <body className="min-h-full flex flex-col">
         <Script id="theme-init" strategy="beforeInteractive">{`
           (function () {
@@ -38,7 +48,8 @@ export default function RootLayout({
             document.documentElement.style.colorScheme = theme;
           })();
         `}</Script>
-        {children}
+
+        <LanguageProvider initialLanguage={initialLanguage}>{children}</LanguageProvider>
       </body>
     </html>
   );
